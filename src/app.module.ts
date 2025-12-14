@@ -4,6 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { getDatabaseConfig } from './config/database.config';
+import { User } from './entities/user.entity';
+import { Sweet } from './entities/sweet.entity';
+import { UsersRepository } from './repositories/users.repository';
+import { SweetsRepository } from './repositories/sweets.repository';
 
 @Module({
   imports: [
@@ -16,8 +20,10 @@ import { getDatabaseConfig } from './config/database.config';
       useFactory: getDatabaseConfig,
       inject: [ConfigService],
     }),
+    TypeOrmModule.forFeature([User, Sweet]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, UsersRepository, SweetsRepository],
+  exports: [UsersRepository, SweetsRepository],
 })
 export class AppModule {}
