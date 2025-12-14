@@ -18,8 +18,6 @@ export class CreateUsersAndSweetsTables1734206400000
             isPrimary: true,
             generationStrategy: 'uuid',
             default: 'uuid_generate_v4()',
-            isGenerated: true,
-            generationStrategy: 'uuid',
           },
           {
             name: 'email',
@@ -72,8 +70,6 @@ export class CreateUsersAndSweetsTables1734206400000
             isPrimary: true,
             generationStrategy: 'uuid',
             default: 'uuid_generate_v4()',
-            isGenerated: true,
-            generationStrategy: 'uuid',
           },
           {
             name: 'name',
