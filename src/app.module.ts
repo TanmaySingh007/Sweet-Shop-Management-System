@@ -8,6 +8,7 @@ import { User } from './entities/user.entity';
 import { Sweet } from './entities/sweet.entity';
 import { UsersRepository } from './repositories/users.repository';
 import { SweetsRepository } from './repositories/sweets.repository';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { SweetsRepository } from './repositories/sweets.repository';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([User, Sweet]),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, UsersRepository, SweetsRepository],
