@@ -13,7 +13,14 @@ export class UsersRepository {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const passwordHash = await bcrypt.hash(createUserDto.password, 10);
+    // If password is already hashed (starts with $2b$), use it directly
+    // Otherwise, hash it
+    const passwordHash =
+      createUserDto.password.startsWith('$2b$') ||
+      createUserDto.password.startsWith('$2a$')
+        ? createUserDto.password
+        : await bcrypt.hash(createUserDto.password, 10);
+
     const user = this.userRepository.create({
       email: createUserDto.email,
       passwordHash,
