@@ -1,98 +1,362 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Sweet Shop Management System
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A full-stack application for managing a sweet shop inventory with user authentication, role-based access control, and transactional purchase operations. Built with NestJS (backend) and React (frontend) following Test-Driven Development (TDD) principles.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Table of Contents
 
-## Description
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Setup Instructions](#setup-instructions)
+- [API Documentation](#api-documentation)
+- [Testing](#testing)
+- [My AI Usage](#my-ai-usage)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Project Overview
 
-## Project setup
+The Sweet Shop Management System is a comprehensive inventory management application that allows users to browse and purchase sweets, while administrators can manage the inventory through CRUD operations. The system ensures data integrity through database transactions and implements role-based authorization for administrative functions.
 
-```bash
-$ npm install
+### Key Features
+
+- **User Authentication**: JWT-based authentication with bcrypt password hashing
+- **Role-Based Access Control**: Admin and regular user roles with protected endpoints
+- **Sweet Management**: Full CRUD operations for managing sweets inventory
+- **Purchase System**: Atomic transaction-based purchase operations preventing overselling
+- **Search Functionality**: Flexible search by name, category, and price range
+- **Restock Operations**: Admin-only inventory restocking
+
+## Tech Stack
+
+### Backend
+- **Framework**: NestJS (Node.js)
+- **Database**: PostgreSQL with TypeORM
+- **Authentication**: Passport.js with JWT strategy
+- **Validation**: class-validator, class-transformer
+- **Testing**: Jest
+
+### Frontend
+- **Framework**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **Routing**: react-router-dom
+- **HTTP Client**: Axios
+- **State Management**: React Context API
+
+## Setup Instructions
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- PostgreSQL (v12 or higher)
+- npm or yarn
+
+### Backend Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/TanmaySingh007/Sweet-Shop-Management-System.git
+   cd Sweet-Shop-Management-System/sweet-shop-api
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**
+   
+   Create a `.env` file in the `sweet-shop-api` directory:
+   ```env
+   # Database Configuration
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   DB_NAME=sweet_shop_db
+
+   # Application Configuration
+   PORT=3000
+   NODE_ENV=development
+
+   # JWT Configuration
+   JWT_SECRET=your-super-secret-jwt-key-change-in-production
+   JWT_EXPIRES_IN=1d
+   ```
+
+4. **Create the database**
+   ```bash
+   createdb sweet_shop_db
+   # Or using psql:
+   # psql -U postgres
+   # CREATE DATABASE sweet_shop_db;
+   ```
+
+5. **Run database migrations**
+   ```bash
+   npm run migration:run
+   ```
+
+6. **Start the development server**
+   ```bash
+   npm run start:dev
+   ```
+
+   The API will be available at `http://localhost:3000/api`
+
+### Frontend Setup
+
+1. **Navigate to frontend directory**
+   ```bash
+   cd ../sweet-shop-frontend
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**
+   
+   Create a `.env` file in the `sweet-shop-frontend` directory:
+   ```env
+   VITE_API_URL=http://localhost:3000/api
+   ```
+
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+   The frontend will be available at `http://localhost:5173`
+
+## API Documentation
+
+### Authentication Endpoints
+
+#### POST /api/auth/register
+Register a new user.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
 ```
 
-## Compile and run the project
+**Response:** User object
 
-```bash
-# development
-$ npm run start
+#### POST /api/auth/login
+Login and receive JWT token.
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
 ```
 
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+**Response:**
+```json
+{
+  "access_token": "jwt-token-here"
+}
 ```
 
-## Deployment
+### Sweets Endpoints
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+#### GET /api/sweets
+Get all available sweets (public endpoint).
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+**Response:** Array of sweet objects
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+#### GET /api/sweets/search
+Search sweets with optional filters.
+
+**Query Parameters:**
+- `name` (optional): Partial match search
+- `category` (optional): Exact match
+- `minPrice` (optional): Minimum price
+- `maxPrice` (optional): Maximum price
+
+**Example:** `/api/sweets/search?name=jamun&category=Traditional&minPrice=40&maxPrice=60`
+
+#### GET /api/sweets/:id
+Get a specific sweet by ID (public endpoint).
+
+#### POST /api/sweets
+Create a new sweet (requires authentication).
+
+**Headers:** `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "name": "Gulab Jamun",
+  "category": "Traditional",
+  "price": 50.0,
+  "quantity": 100
+}
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+#### POST /api/sweets/:id/purchase
+Purchase a sweet (requires authentication).
 
-## Resources
+**Headers:** `Authorization: Bearer <token>`
 
-Check out a few resources that may come in handy when working with NestJS:
+**Response:** Updated sweet object with decremented quantity
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+#### POST /api/sweets/:id/restock
+Restock a sweet (requires admin authentication).
 
-## Support
+**Headers:** `Authorization: Bearer <admin-token>`
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+**Request Body:**
+```json
+{
+  "quantity": 50
+}
+```
 
-## Stay in touch
+#### DELETE /api/sweets/:id
+Delete a sweet (requires admin authentication).
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+**Headers:** `Authorization: Bearer <admin-token>`
+
+**Response:** 204 No Content
+
+## Testing
+
+### Running Tests
+
+**Unit Tests:**
+```bash
+npm test
+```
+
+**E2E Tests:**
+```bash
+npm run test:e2e
+```
+
+**Test Coverage:**
+```bash
+npm run test:cov
+```
+
+The project maintains high test coverage with comprehensive unit and integration tests following TDD principles.
+
+### Test Coverage Goals
+
+- Minimum 90% line and branch coverage
+- Comprehensive exception handling tests
+- Transaction concurrency tests
+- Authorization and authentication tests
+
+## Database Migrations
+
+**Generate a new migration:**
+```bash
+npm run migration:generate -- -n MigrationName
+```
+
+**Run pending migrations:**
+```bash
+npm run migration:run
+```
+
+**Revert last migration:**
+```bash
+npm run migration:revert
+```
+
+**Show migration status:**
+```bash
+npm run migration:show
+```
+
+## Project Structure
+
+```
+sweet-shop-api/
+├── src/
+│   ├── auth/              # Authentication module
+│   │   ├── decorators/    # Custom decorators (@Roles)
+│   │   ├── guards/        # Guards (RolesGuard)
+│   │   ├── strategies/    # Passport strategies
+│   │   └── dto/           # Authentication DTOs
+│   ├── sweets/            # Sweets module
+│   │   ├── dto/           # Sweet-related DTOs
+│   │   └── exceptions/    # Custom exceptions
+│   ├── entities/          # TypeORM entities
+│   ├── repositories/      # Data access layer
+│   └── config/            # Configuration files
+├── test/                  # E2E tests
+└── src/migrations/        # Database migrations
+```
+
+## Screenshots
+
+_Screenshots of the application will be added here._
+
+## My AI Usage
+
+### Tools Used
+**Cursor AI**
+
+### How it was Used
+
+The AI assistant (Cursor AI) was extensively used throughout the development process to streamline the Test-Driven Development (TDD) workflow and ensure consistent code quality:
+
+1. **TDD Test Boilerplate Generation (Red Phase)**
+   - Generated comprehensive unit test structures for services, controllers, and guards
+   - Created E2E test templates for API endpoints
+   - Developed test cases covering edge cases, error scenarios, and concurrency situations
+   - Ensured test assertions matched business requirements precisely
+
+2. **Service Layer Implementation (Green Phase)**
+   - Implemented NestJS service methods following best practices
+   - Created database transaction logic using TypeORM QueryRunner
+   - Developed repository pattern implementations with TypeORM
+   - Built authentication and authorization guards with proper error handling
+
+3. **Database Transaction Implementation**
+   - Designed atomic transaction logic for purchase operations
+   - Implemented pessimistic locking to prevent race conditions
+   - Created proper rollback mechanisms for error scenarios
+   - Ensured data integrity through proper transaction management
+
+4. **Git Co-authorship Policy Compliance**
+   - Generated commit messages following conventional commit format
+   - Added AI co-authorship attribution to all commits
+   - Maintained consistent commit message structure throughout the project
+
+5. **Code Structure and Organization**
+   - Helped organize modules following NestJS best practices
+   - Created proper separation of concerns (controllers, services, repositories)
+   - Implemented DTOs with validation decorators
+   - Established proper exception handling strategies
+
+### Reflection
+
+The AI assistant systematically streamlined the Red-Green-Refactor cycle, enabling faster iteration and superior adherence to development process rigor. Key benefits included:
+
+- **Accelerated TDD Workflow**: The AI quickly generated comprehensive test suites, allowing me to focus on business logic rather than test boilerplate
+- **Consistency**: All code followed consistent patterns and best practices, reducing technical debt
+- **Comprehensive Coverage**: The AI helped identify edge cases and scenarios that might have been overlooked, resulting in more robust code
+- **Error Handling**: Systematic implementation of proper exception handling and validation ensured production-ready code quality
+- **Documentation**: Maintained clear commit messages and code structure that enhances maintainability
+
+The collaborative approach with AI significantly enhanced productivity while maintaining high code quality standards and ensuring full compliance with the TDD methodology and project requirements.
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is part of a coding kata/assignment and is intended for educational purposes.
+
+## Author
+
+Tanmay Singh
+
+---
+
+For questions or issues, please open an issue on the GitHub repository.
