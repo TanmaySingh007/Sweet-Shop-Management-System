@@ -3,13 +3,14 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SweetsRepository } from './sweets.repository';
 import { Sweet } from '../entities/sweet.entity';
-import { CreateSweetDto } from '../dto/create-sweet.dto';
+import { SearchSweetsDto } from '../sweets/dto/search-sweets.dto';
 
 describe('SweetsRepository', () => {
   let repository: SweetsRepository;
   let sweetRepository: Repository<Sweet>;
 
   const mockRepository = {
+    createQueryBuilder: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
     find: jest.fn(),
@@ -29,66 +30,114 @@ describe('SweetsRepository', () => {
 
     repository = module.get<SweetsRepository>(SweetsRepository);
     sweetRepository = module.get<Repository<Sweet>>(getRepositoryToken(Sweet));
+
+    jest.clearAllMocks();
   });
 
-  describe('create', () => {
-    it('should fail to create a sweet when database table does not exist', async () => {
-      const createSweetDto: CreateSweetDto = {
-        name: 'Gulab Jamun',
-        category: 'Traditional',
-        price: 50.0,
-        quantity: 100,
+  describe('search', () => {
+    it('should construct TypeORM query with name filter using ILIKE', async () => {
+      const searchDto: SearchSweetsDto = { name: 'jamun' };
+      const mockQueryBuilder = {
+        andWhere: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
       };
 
-      // This will fail because the sweets table doesn't exist yet (RED phase)
-      mockRepository.save.mockRejectedValueOnce(
-        new Error('relation "sweets" does not exist'),
-      );
+      mockRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
 
-      await expect(repository.create(createSweetDto)).rejects.toThrow(
-        'relation "sweets" does not exist',
+      await repository.search(searchDto);
+
+      expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('sweet');
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sweet.name ILIKE :name',
+        { name: '%jamun%' },
       );
+      expect(mockQueryBuilder.getMany).toHaveBeenCalled();
     });
 
-    it('should attempt to save sweet with correct properties', async () => {
-      const createSweetDto: CreateSweetDto = {
-        name: 'Barfi',
-        category: 'Traditional',
-        price: 75.5,
-        quantity: 50,
+    it('should construct TypeORM query with category filter using exact match', async () => {
+      const searchDto: SearchSweetsDto = { category: 'Traditional' };
+      const mockQueryBuilder = {
+        andWhere: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
       };
 
-      mockRepository.save.mockRejectedValueOnce(
-        new Error('relation "sweets" does not exist'),
-      );
+      mockRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
 
-      await expect(repository.create(createSweetDto)).rejects.toThrow();
-      expect(mockRepository.create).toHaveBeenCalled();
-    });
-  });
+      await repository.search(searchDto);
 
-  describe('findAll', () => {
-    it('should fail to find all sweets when table does not exist', async () => {
-      mockRepository.find.mockRejectedValueOnce(
-        new Error('relation "sweets" does not exist'),
-      );
-
-      await expect(repository.findAll()).rejects.toThrow(
-        'relation "sweets" does not exist',
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sweet.category = :category',
+        { category: 'Traditional' },
       );
     });
-  });
 
-  describe('findById', () => {
-    it('should fail to find sweet by id when table does not exist', async () => {
-      mockRepository.findOne.mockRejectedValueOnce(
-        new Error('relation "sweets" does not exist'),
+    it('should construct TypeORM query with minPrice filter', async () => {
+      const searchDto: SearchSweetsDto = { minPrice: 50 };
+      const mockQueryBuilder = {
+        andWhere: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+      };
+
+      mockRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
+
+      await repository.search(searchDto);
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sweet.price >= :minPrice',
+        { minPrice: 50 },
       );
+    });
 
-      await expect(repository.findById('test-id')).rejects.toThrow(
-        'relation "sweets" does not exist',
+    it('should construct TypeORM query with maxPrice filter', async () => {
+      const searchDto: SearchSweetsDto = { maxPrice: 100 };
+      const mockQueryBuilder = {
+        andWhere: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+      };
+
+      mockRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
+
+      await repository.search(searchDto);
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sweet.price <= :maxPrice',
+        { maxPrice: 100 },
+      );
+    });
+
+    it('should construct TypeORM query with multiple filters combined', async () => {
+      const searchDto: SearchSweetsDto = {
+        name: 'jamun',
+        category: 'Traditional',
+        minPrice: 40,
+        maxPrice: 60,
+      };
+      const mockQueryBuilder = {
+        andWhere: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+      };
+
+      mockRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
+
+      await repository.search(searchDto);
+
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledTimes(4);
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sweet.name ILIKE :name',
+        { name: '%jamun%' },
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sweet.category = :category',
+        { category: 'Traditional' },
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sweet.price >= :minPrice',
+        { minPrice: 40 },
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'sweet.price <= :maxPrice',
+        { maxPrice: 60 },
       );
     });
   });
 });
-

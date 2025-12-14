@@ -9,6 +9,7 @@ import { Sweet } from './entities/sweet.entity';
 import { UsersRepository } from './repositories/users.repository';
 import { SweetsRepository } from './repositories/sweets.repository';
 import { AuthModule } from './auth/auth.module';
+import { SweetsModule } from './sweets/sweets.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     TypeOrmModule.forFeature([User, Sweet]),
     AuthModule,
+    SweetsModule,
   ],
   controllers: [AppController],
   providers: [AppService, UsersRepository, SweetsRepository],
