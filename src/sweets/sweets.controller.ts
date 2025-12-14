@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { SweetsService } from './sweets.service';
 import { CreateSweetDto } from '../dto/create-sweet.dto';
 import { SearchSweetsDto } from './dto/search-sweets.dto';
+import { RestockDto } from './dto/restock.dto';
 import { Sweet } from '../entities/sweet.entity';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -34,6 +35,19 @@ export class SweetsController {
       throw new NotFoundException('Sweet not found');
     }
     return sweet;
+  }
+
+  @Post(':id/purchase')
+  @UseGuards(AuthGuard('jwt'))
+  async purchase(@Param('id') id: string): Promise<Sweet> {
+    return await this.sweetsService.purchaseSweet(id);
+  }
+
+  @Post(':id/restock')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('admin')
+  async restock(@Param('id') id: string, @Body() restockDto: RestockDto): Promise<Sweet> {
+    return await this.sweetsService.restock(id, restockDto.quantity);
   }
 
   @Delete(':id')

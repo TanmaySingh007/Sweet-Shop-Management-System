@@ -63,5 +63,9 @@ export class SweetsRepository {
   async delete(id: string): Promise<void> {
     await this.sweetRepository.delete(id);
   }
+
+  async updateQuantity(id: string, quantity: number): Promise<void> {
+    await this.sweetRepository.update(id, { quantity });
+  }
 }
 
